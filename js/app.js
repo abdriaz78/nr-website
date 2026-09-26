@@ -186,10 +186,27 @@
     const toggle = document.getElementById("navToggle");
     const nav = document.getElementById("mainNav");
     if (!toggle || !nav) return;
-    toggle.addEventListener("click", () => nav.classList.toggle("open"));
+    const setOpen = (open) => {
+      nav.classList.toggle("open", open);
+      toggle.setAttribute("aria-expanded", String(open));
+      toggle.innerHTML = open ? "&#10005;" : "&#9776;";
+    };
+    toggle.addEventListener("click", (e) => {
+      e.stopPropagation();
+      setOpen(!nav.classList.contains("open"));
+    });
     nav.querySelectorAll("a").forEach((a) =>
-      a.addEventListener("click", () => nav.classList.remove("open"))
+      a.addEventListener("click", () => setOpen(false))
     );
+    document.addEventListener("click", (e) => {
+      if (nav.classList.contains("open") && !nav.contains(e.target)) setOpen(false);
+    });
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Escape") setOpen(false);
+    });
+    window.addEventListener("resize", () => {
+      if (window.innerWidth > 980) setOpen(false);
+    });
   }
 
   document.addEventListener("DOMContentLoaded", () => {
